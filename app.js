@@ -5,11 +5,12 @@
 	views directory. Server side Javascript code in this file can facilitate the exchange
 	of data between the database and the front end.
 */
-var express		 	= require('express'),
-	app				= express(),
-	methodOverride	= require('method-override'),
-	bodyParser		= require('body-parser'),
-	mongoose		= require('mongoose');
+var express		 		= require('express'),
+	app					= express(),
+	methodOverride		= require('method-override'),
+	expressSanitizer	= require('express-sanitizer'),
+	bodyParser			= require('body-parser'),
+	mongoose			= require('mongoose');
 
 /*
 	MongoDB applications consist of three basic components:
@@ -81,6 +82,12 @@ app.use(methodOverride('_method'));
 */
 app.use(bodyParser.urlencoded({extended: true}));
 
+/*
+	Express Sanitizer will prevent the use of javascript code in text forms. This
+	line must be added after bodyParser.
+*/
+app.use(expressSanitizer());
+
 // Create reference to a Schema
 var blogSchema = new mongoose.Schema({
 	title: String,
@@ -121,6 +128,9 @@ app.get('/blogs/new', function(req, res) {
 	Blog.create() function.
 */
 app.post('/blogs', function(req, res) {
+	// Sanitize javascript from text forms
+	req.body.blog.body = req.sanitize(req.body.blog.body);
+
 	Blog.create(req.body.blog, function(err, newBlog) {
 		if (err) {
 			res.render('new');
@@ -166,6 +176,9 @@ app.get('/blogs/:id/edit', function(req, res) {
 	follow RESTful routing, a PUT route is necessary.
 */
 app.put('/blogs/:id/', function(req, res) {
+	// Sanitize javascript from text forms
+	req.body.blog.body = req.sanitize(req.body.blog.body);
+	
 	// Blog.findByIdAndUpdate takes in three parameters, the id, the data from the
 	// form, and a callback.
 	Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, foundBlog) {
