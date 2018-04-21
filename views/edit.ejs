@@ -1,0 +1,22 @@
+<% include ./partials/header %>
+
+<div class="ui main text container segment">
+	<div class="ui huge header">Edit <%= blog.title %></div>
+	<!-- Send data to the PUT route, since HTTP form does not support PUT, we use method 
+		overrride to send a PUT request. -->
+	<form class="ui form" action="/blogs/<%= blog._id %>?_method=PUT" method="POST">
+		<div class="field">
+			<!-- Body Parser uses blog[title] to create a blog object (req.body.blog).
+			 This makes it simple to pass the blog object to Blog.create() -->
+			<label>Title</label>
+			<input type="text" name="blog[title]" value="<%= blog.title %>">
+		</div>
+		<div class="field">
+			<label>Content</label>
+			<textarea name="blog[body]"><%= blog.body %></textarea>
+		</div>
+		<input class="ui green basic button" type="submit">
+	</form>
+</div>
+
+<% include ./partials/footer %>

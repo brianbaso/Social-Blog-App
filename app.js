@@ -7,6 +7,7 @@
 */
 var express		 	= require('express'),
 	app				= express(),
+	methodOverride	= require('method-override'),
 	bodyParser		= require('body-parser'),
 	mongoose		= require('mongoose');
 
@@ -47,13 +48,21 @@ db.once('open', function() {
 */
 app.set('view engine', 'ejs');
 
-/*	
+/*****	
 	When app.use() is called with only one arguement (a function), it will match
 	every request. It will act as middleware.
 	If app.use() has a route as the first arguement, it will only act on those
 	requests.
-*/
+*****/
 app.use(express.static('public'));
+
+/*
+	Use methodOverride across all pages, this module is used to overrride routes
+	into PUT, DELETE, etc. since only GET and POST are supported by HTTP forms.
+
+	All frameworks have different ways of overriding their routes.
+*/
+app.use(methodOverride('_method'));
 
 /*
 	Body Parser: Allow data from forms to be available in the request body object.
@@ -98,6 +107,10 @@ app.get('/blogs', function(req, res) {
 	})
 });
 
+/*
+	Creating a GET route to display the page for a new blog entry, on the page there
+	will be a form with a post route.
+*/
 app.get('/blogs/new', function(req, res) {
 	res.render('new');
 });
@@ -118,24 +131,57 @@ app.post('/blogs', function(req, res) {
 })
 
 /*
-	Creating a show route to grab a specific object from the database and then return
+	Creating a SHOW route to grab a specific object from the database and then return
 	it as the foundBlog arguement to the show page.
 */
 app.get('/blogs/:id', function(req, res) {
+	// Blog.findById takes in two parameters, the id and a callback
 	Blog.findById(req.params.id, function(err, foundBlog) {
 		if (err) {
 			res.redirect('/blogs');
 		} else {
-			// The retrieved blog will be refered to as 'blog' in the template
+			// The retrieved blog will be refered to as 'blog' in the template.
 			res.render('show', {blog: foundBlog});
 		}
 	})
 });
 
+/*
+	Creating an EDIT route, sending data through to edit page so that user does not
+	have to rewrite content when editing, instead it will be displayed through ejs.
+*/
+app.get('/blogs/:id/edit', function(req, res) {
+	Blog.findById(req.params.id, function(err, foundBlog) {
+		if (err) {
+			res.redirect('/blogs');
+		} else {
+			res.render('edit', {blog: foundBlog});
+		}
+	})
+});
+
+/*
+	Creating a PUT route to recieve the data from the edit form and then update the
+	blog entry in the database. This could be done with a POST route but in order to 
+	follow RESTful routing, a PUT route is necessary.
+*/
+app.put('/blogs/:id/', function(req, res) {
+	// Blog.findByIdAndUpdate takes in three parameters, the id, the data from the
+	// form, and a callback.
+	Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, foundBlog) {
+		if (err) {
+			res.redirect('/blogs');
+		} else {
+			res.render('/blogs/' + req.params.id);
+		}
+	})
+});
+
+
 app.get('/', function(req, res) {
 	res.redirect('/blogs');
-})
+});
 
 app.listen(3000, function() {
 	console.log('Personal Website Server Started...');
-})
+});
