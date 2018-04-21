@@ -104,7 +104,7 @@ app.get('/blogs', function(req, res) {
 			// Recieve data from blogs parameter and call it blogs
 			res.render('index', {blogs: blogs});
 		}
-	})
+	});
 });
 
 /*
@@ -127,7 +127,7 @@ app.post('/blogs', function(req, res) {
 		} else {
 			res.redirect('/blogs');
 		}
-	})
+	});
 })
 
 /*
@@ -143,7 +143,7 @@ app.get('/blogs/:id', function(req, res) {
 			// The retrieved blog will be refered to as 'blog' in the template.
 			res.render('show', {blog: foundBlog});
 		}
-	})
+	});
 });
 
 /*
@@ -157,7 +157,7 @@ app.get('/blogs/:id/edit', function(req, res) {
 		} else {
 			res.render('edit', {blog: foundBlog});
 		}
-	})
+	});
 });
 
 /*
@@ -172,11 +172,23 @@ app.put('/blogs/:id/', function(req, res) {
 		if (err) {
 			res.redirect('/blogs');
 		} else {
-			res.render('/blogs/' + req.params.id);
+			res.redirect('/blogs/' + req.params.id);
 		}
-	})
+	});
 });
 
+/*
+	Creating a DELETE route to remove blogs from the database.
+*/
+app.delete('/blogs/:id', function(req, res) {
+	Blog.findByIdAndRemove(req.params.id, function(err) {
+		if (err) {
+			res.redirect("/blogs");
+		} else {
+			res.redirect("/blogs");
+		}
+	});
+});
 
 app.get('/', function(req, res) {
 	res.redirect('/blogs');

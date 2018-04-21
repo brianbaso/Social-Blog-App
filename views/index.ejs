@@ -4,8 +4,8 @@
 	<% blogs.forEach(function(blog) { %>
 		<div>
 			<h2><%= blog.title %></h2>
-			<span><%= blog.created %></span>
-			<p><%= blog.body.substring(0, 200) %></p>
+			<span><strong><%= blog.created.getFullYear() %></strong></span>
+			<p><%= blog.body.substring(0, 200) %>...</p>
 			<a href="/blogs/<%= blog._id %>">Read More</a>
 		</div>
 	<% }) %>
