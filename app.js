@@ -127,7 +127,7 @@ app.get('/blogs', function(req, res) {
 	Creating a GET route to display the page for a new blog entry, on the page there
 	will be a form with a post route.
 */
-app.get('/blogs/new', function(req, res) {
+app.get('/blogs/new', isLoggedIn, function(req, res) {
 	res.render('new');
 });
 
@@ -136,7 +136,7 @@ app.get('/blogs/new', function(req, res) {
 	packaged into the req.body.blog object which is added to the database using the
 	Blog.create() function.
 */
-app.post('/blogs', function(req, res) {
+app.post('/blogs', isLoggedIn, function(req, res) {
 	// Sanitize javascript from text forms
 	req.body.blog.body = req.sanitize(req.body.blog.body);
 
@@ -169,7 +169,7 @@ app.get('/blogs/:id', function(req, res) {
 	Creating an EDIT route, sending data through to edit page so that user does not
 	have to rewrite content when editing, instead it will be displayed through ejs.
 */
-app.get('/blogs/:id/edit', function(req, res) {
+app.get('/blogs/:id/edit', isLoggedIn, function(req, res) {
 	Blog.findById(req.params.id, function(err, foundBlog) {
 		if (err) {
 			res.redirect('/blogs');
@@ -184,7 +184,7 @@ app.get('/blogs/:id/edit', function(req, res) {
 	blog entry in the database. This could be done with a POST route but in order to 
 	follow RESTful routing, a PUT route is necessary.
 */
-app.put('/blogs/:id/', function(req, res) {
+app.put('/blogs/:id/', isLoggedIn, function(req, res) {
 	// Sanitize javascript from text forms
 	req.body.blog.body = req.sanitize(req.body.blog.body);
 	
@@ -202,7 +202,7 @@ app.put('/blogs/:id/', function(req, res) {
 /*
 	Creating a DELETE route to remove blogs from the database.
 */
-app.delete('/blogs/:id', function(req, res) {
+app.delete('/blogs/:id', isLoggedIn, function(req, res) {
 	Blog.findByIdAndRemove(req.params.id, function(err) {
 		if (err) {
 			res.redirect("/blogs");
@@ -256,6 +256,18 @@ app.post('/login', passport.authenticate('local',
 		failureRedirect: "/login"
 	}), function(req, res) { 
 });
+
+app.get('/logout', function(req, res) {
+	req.logout();
+	res.redirect('blogs');
+});
+
+function isLoggedIn(req, res, next) {
+	if (req.isAuthenticated()) {
+		return next();
+	}
+	res.redirect('/login');
+}
 
 app.get('/', function(req, res) {
 	res.redirect('/blogs');
