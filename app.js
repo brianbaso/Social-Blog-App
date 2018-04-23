@@ -9,8 +9,11 @@ var express		 		= require('express'),
 	app					= express(),
 	methodOverride		= require('method-override'),
 	expressSanitizer	= require('express-sanitizer'),
+	passport			= require('passport'),
+	LocalStrategy		= require('passport-local'),
 	bodyParser			= require('body-parser'),
 	mongoose			= require('mongoose'),
+	User 				= require('./models/user'),
 	Post				= require('./models/post');
 
 /*
@@ -88,6 +91,21 @@ app.use(bodyParser.urlencoded({extended: true}));
 	line must be added after bodyParser.
 */
 app.use(expressSanitizer());
+
+/*
+	Passport config: a bunch of mumbojumbo to automate user authentication with some 
+	useful node modules
+*/
+app.use(require('express-session')({
+	secret: 'ejjd7&&2k3(!2462ABNcNK',
+	resave: false,
+	saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.serializeUser());
 
 /*
 	Creating a GET route for the /blogs page, the 'index.ejs' page will now have access to
@@ -191,6 +209,36 @@ app.delete('/blogs/:id', function(req, res) {
 		} else {
 			res.redirect("/blogs");
 		}
+	});
+});
+
+/*
+	Creating a GET route for the register form, authentication is not require for my
+	personal website, but I wanted the practice and also I may build some social features on
+	the app down the road.
+*/
+app.get('/register', function(req, res) {
+	res.render('register');
+});
+
+/*
+	Creating a POST route to send new user info to the passport module. If the data is
+	valid, we will create a new user in the database and hash their password. This route
+	takes care of all the sign up logic.
+*/
+app.post('/register', function(req, res) {
+	var newUser = new User({username: req.body.username});
+	// User object comes with the register method that takes three arguements:
+	// the new User object that holds the username, the password which will be submitted
+	// for hashing, and a callback function
+	User.register(newUser, req.body.password, function(err, user) {
+		if (err) {
+			console.log(err);
+			return res.render('/register');
+		}
+		passport.authenticate("local")(req, res, function() {
+			res.redirect('/blogs');
+		});
 	});
 });
 
