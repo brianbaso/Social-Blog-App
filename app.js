@@ -14,7 +14,7 @@ var express		 		= require('express'),
 	bodyParser			= require('body-parser'),
 	mongoose			= require('mongoose'),
 	User 				= require('./models/user'),
-	Post				= require('./models/post');
+	Blog				= require('./models/post');
 
 /*
 	MongoDB applications consist of three basic components:
@@ -105,7 +105,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 /*
 	Creating a GET route for the /blogs page, the 'index.ejs' page will now have access to
@@ -234,12 +234,27 @@ app.post('/register', function(req, res) {
 	User.register(newUser, req.body.password, function(err, user) {
 		if (err) {
 			console.log(err);
-			return res.render('/register');
+			return res.redirect('register');
 		}
-		passport.authenticate("local")(req, res, function() {
-			res.redirect('/blogs');
+		passport.authenticate('local')(req, res, function() {
+			res.redirect('blogs');
 		});
 	});
+});
+
+app.get('/login', function(req, res) {
+	res.render('login');
+});
+
+/*
+	Creating a post route to handle users logging in.
+	Takes three arguements: ('/login', middleware, callback)
+*/
+app.post('/login', passport.authenticate('local',
+	{
+		successRedirect: "/blogs",
+		failureRedirect: "/login"
+	}), function(req, res) { 
 });
 
 app.get('/', function(req, res) {
