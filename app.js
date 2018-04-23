@@ -107,6 +107,12 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// Allow req.user to be accessed in any ejs file
+app.use(function(req, res, next) {
+	res.locals.currentUser = req.user;
+	next();
+});
+
 /*
 	Creating a GET route for the /blogs page, the 'index.ejs' page will now have access to
 	the blogs object in MongoDB where it can be rendered through the ejs template engine.
@@ -118,7 +124,7 @@ app.get('/blogs', function(req, res) {
 			console.log(err);
 		} else {
 			// Recieve data from blogs parameter and call it blogs
-			res.render('index', {blogs: blogs});
+			res.render('index', {blogs: blogs, currentUser: req.user});
 		}
 	});
 });
