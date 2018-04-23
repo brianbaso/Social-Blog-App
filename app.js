@@ -10,7 +10,8 @@ var express		 		= require('express'),
 	methodOverride		= require('method-override'),
 	expressSanitizer	= require('express-sanitizer'),
 	bodyParser			= require('body-parser'),
-	mongoose			= require('mongoose');
+	mongoose			= require('mongoose'),
+	Post				= require('./models/post');
 
 /*
 	MongoDB applications consist of three basic components:
@@ -87,16 +88,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 	line must be added after bodyParser.
 */
 app.use(expressSanitizer());
-
-// Create reference to a Schema
-var blogSchema = new mongoose.Schema({
-	title: String,
-	body: String,
-	created: {type: Date, default: Date.now}
-});
-
-// Complile the Schema above into a model
-var Blog = mongoose.model("Blog", blogSchema);
 
 /*
 	Creating a GET route for the /blogs page, the 'index.ejs' page will now have access to
