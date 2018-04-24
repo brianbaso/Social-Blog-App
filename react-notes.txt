@@ -1,0 +1,36 @@
+What is React?
+- Javascript framework for creating user interfaces
+- Can be used to build a variety of things: Full page single web applications, or just certain 'components' of a website like a search form.
+- Component based
+- Fast (Uses the virtual DOM)
+- Created by Facebook
+
+From Pete Hunt React 2013 Talk
+React attempts to:
+	- Reduce "coupling": the degree that modules rely on one another. When we want to change a feature, how many different files do we have to go back and edit? This makes software harder to maintain.
+	- Increase "cohesion": the degree that elements of a module belong together
+	- Bring the accessability of templates with the power of Javascript.
+
+What is a React Component?
+	- A building block for user interfaces where these blocks work together optimally inside of modules. These building blocks also do not rely on one another to a certain extent.
+	- Components are reuseable
+	- Components are able to be reassembeled in different variations to satisfy specific user requirements
+	- Components are unit testable
+	- React components are like functions that take an input and give the same output everytime, they are just 
+functions that take parameters and return a description of the UI
+
+What is state?
+	- The information stored in memory constantly changes in your web application. With this information you can access your variables, classes, data structures, etc. If you pause time and check all the information thats collected in your application, it's called the application state.
+	- Example: 1) You recieve a POST request. 2) Decide if you want to persist this data. If so, you would write the current 'application state' into your database. 3) Next time you get a GET request, you will load the data from a source inside the persisted application state
+
+Some React vocabulary:
+	- setState() tells the component that the data has changed
+	- render describes how the UI looks at any point in time
+	- Every place react displays data is guaranteed to be up to date 
+
+React uses a 'Virtual DOM'
+How React Flows
+	1) You have your application state and browser events from the users.
+	2) These flow into the React component tree which describes how your app should work. It's the business logic of your application.
+	3) We create a virtual DOM that shows how your app should eventually look.
+	4) We pass the virtual DOM to the backend that computes the necessary operations, and then sends it to the DOM 
