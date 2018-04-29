@@ -12,7 +12,7 @@
 			</div>
 			<!-- Have access to the blog object and current user from our app.use on the home page.
 			     Do not have access to foundBlog or the req.user._id value -->
-			<% if (blog.author.id.equals(currentUser._id)) { %>
+			<% if (currentUser && blog.author.id.equals(currentUser._id)) { %>
 				<a class="ui orange basic button" href="/blogs/<%= blog._id %>/edit">Edit</a>
 				<form id="delete" action="/blogs/<%= blog._id %>?_method=DELETE" method="POST">
 					<button class="ui red basic button">Delete</button>

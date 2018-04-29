@@ -59,13 +59,6 @@ router.get('/logout', function(req, res) {
 	res.redirect('blogs');
 });
 
-function isLoggedIn(req, res, next) {
-	if (req.isAuthenticated()) {
-		return next();
-	}
-	res.redirect('/login');
-}
-
 router.get('/', function(req, res) {
 	res.redirect('/blogs');
 });

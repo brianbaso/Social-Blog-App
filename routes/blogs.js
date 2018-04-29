@@ -7,7 +7,10 @@
 var express 	= require('express'),
 	router 		= express.Router(),
 	passport	= require('passport'),
-	Blog 		= require('../models/post');
+	Blog 		= require('../models/post'),
+	// Not required to add /index at the end of the route below, index.js is understood by default,
+	// This is also shown in the var express = require('express') statement above.
+	middleware	= require('../middleware');
 
 
 /*
@@ -30,7 +33,7 @@ router.get('/blogs', function(req, res) {
 	Creating a GET route to display the page for a new blog entry, on the page there
 	will be a form with a post route.
 */
-router.get('/blogs/new', isLoggedIn, function(req, res) {
+router.get('/blogs/new', middleware.isLoggedIn, function(req, res) {
 	res.render('new');
 });
 
@@ -39,7 +42,7 @@ router.get('/blogs/new', isLoggedIn, function(req, res) {
 	packaged into the req.body.blog object which is added to the database using the
 	Blog.create() function.
 */
-router.post('/blogs', isLoggedIn, function(req, res) {
+router.post('/blogs', middleware.isLoggedIn, function(req, res) {
 
 	// Sanitize javascript from text forms
 	req.body.blog.body = req.sanitize(req.body.blog.body);
@@ -83,7 +86,7 @@ router.get('/blogs/:id', function(req, res) {
 	Creating an EDIT route, sending data through to edit page so that user does not
 	have to rewrite content when editing, instead it will be displayed through ejs.
 */
-router.get('/blogs/:id/edit', checkBlogOwnership, function(req, res) {
+router.get('/blogs/:id/edit', middleware.checkBlogOwnership, function(req, res) {
 	Blog.findById(req.params.id, function(err, foundBlog) {
 		res.render('edit', {blog: foundBlog});
 	});
@@ -94,7 +97,7 @@ router.get('/blogs/:id/edit', checkBlogOwnership, function(req, res) {
 	blog entry in the database. This could be done with a POST route but in order to 
 	follow RESTful routing, a PUT route is necessary.
 */
-router.put('/blogs/:id/', checkBlogOwnership, function(req, res) {
+router.put('/blogs/:id/', middleware.checkBlogOwnership, function(req, res) {
 	// Sanitize javascript from text forms
 	req.body.blog.body = req.sanitize(req.body.blog.body);
 	
@@ -112,7 +115,7 @@ router.put('/blogs/:id/', checkBlogOwnership, function(req, res) {
 /*
 	Creating a DELETE route to remove blogs from the database.
 */
-router.delete('/blogs/:id', checkBlogOwnership, function(req, res) {
+router.delete('/blogs/:id', middleware.checkBlogOwnership, function(req, res) {
 	Blog.findByIdAndRemove(req.params.id, function(err) {
 		if (err) {
 			res.redirect("/blogs");
@@ -121,30 +124,5 @@ router.delete('/blogs/:id', checkBlogOwnership, function(req, res) {
 		}
 	});
 });
-
-function isLoggedIn(req, res, next) {
-	if (req.isAuthenticated()) {
-		return next();
-	}
-	res.redirect('/login');
-}
-
-function checkBlogOwnership(req, res, next) {
-	if (req.isAuthenticated()) {
-		Blog.findById(req.params.id, function(err, foundBlog) {
-			if (err) {
-				res.redirect('back');
-			} else {
-				if (foundBlog.author.id.equals(req.user._id)) {
-					next();
-				} else {
-					res.redirect('back'); 
-				}
-			}
-		});
-	} else {
-		res.redirect('back');
-	}
-}
 
 module.exports = router;
