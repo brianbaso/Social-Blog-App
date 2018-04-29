@@ -4,7 +4,14 @@ var mongoose = require('mongoose');
 var blogSchema = new mongoose.Schema({
 	title: String,
 	body: String,
-	created: {type: Date, default: Date.now}
+	created: {type: Date, default: Date.now},
+	author: {
+		id: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User"
+		},
+		username: String
+	}
 });
 
 // Complile the Schema above into a model

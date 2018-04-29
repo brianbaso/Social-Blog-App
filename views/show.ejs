@@ -5,15 +5,19 @@
 	<div class ="ui top attached">
 		<div class="item">
 			<div class="content">
-				<span><%= blog.created.getFullYear() %></span>
+				<span><%= blog.created.getFullYear() %> by <%= blog.author.username %></span>
 			</div>
 			<div class="description">
 				<p><%- blog.body %></p>
 			</div>
-			<a class="ui orange basic button" href="/blogs/<%= blog._id %>/edit">Edit</a>
-			<form id="delete" action="/blogs/<%= blog._id %>?_method=DELETE" method="POST">
-				<button class="ui red basic button">Delete</button>
-			</form>
+			<!-- Have access to the blog object and current user from our app.use on the home page.
+			     Do not have access to foundBlog or the req.user._id value -->
+			<% if (blog.author.id.equals(currentUser._id)) { %>
+				<a class="ui orange basic button" href="/blogs/<%= blog._id %>/edit">Edit</a>
+				<form id="delete" action="/blogs/<%= blog._id %>?_method=DELETE" method="POST">
+					<button class="ui red basic button">Delete</button>
+				</form>
+			<% } %>
 		</div>
 	</div>
 </div>

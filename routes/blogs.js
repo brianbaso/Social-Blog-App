@@ -6,6 +6,7 @@
 */
 var express 	= require('express'),
 	router 		= express.Router(),
+	passport	= require('passport'),
 	Blog 		= require('../models/post');
 
 
@@ -39,11 +40,22 @@ router.get('/blogs/new', isLoggedIn, function(req, res) {
 	Blog.create() function.
 */
 router.post('/blogs', isLoggedIn, function(req, res) {
+
 	// Sanitize javascript from text forms
 	req.body.blog.body = req.sanitize(req.body.blog.body);
 
-	Blog.create(req.body.blog, function(err, newBlog) {
+	var title = req.body.blog.title;
+	var body = req.body.blog.body;
+	// Figure out how to capture 'created' from the schema
+	var author = {
+        id: req.user._id,
+        username: req.user.username
+    }
+    var newBlog = {title: title, body: body, author: author}
+
+	Blog.create(newBlog, function(err, newBlog) {
 		if (err) {
+			console.log(err);
 			res.render('new');
 		} else {
 			res.redirect('/blogs');
@@ -71,13 +83,9 @@ router.get('/blogs/:id', function(req, res) {
 	Creating an EDIT route, sending data through to edit page so that user does not
 	have to rewrite content when editing, instead it will be displayed through ejs.
 */
-router.get('/blogs/:id/edit', isLoggedIn, function(req, res) {
+router.get('/blogs/:id/edit', checkBlogOwnership, function(req, res) {
 	Blog.findById(req.params.id, function(err, foundBlog) {
-		if (err) {
-			res.redirect('/blogs');
-		} else {
-			res.render('edit', {blog: foundBlog});
-		}
+		res.render('edit', {blog: foundBlog});
 	});
 });
 
@@ -86,7 +94,7 @@ router.get('/blogs/:id/edit', isLoggedIn, function(req, res) {
 	blog entry in the database. This could be done with a POST route but in order to 
 	follow RESTful routing, a PUT route is necessary.
 */
-router.put('/blogs/:id/', isLoggedIn, function(req, res) {
+router.put('/blogs/:id/', checkBlogOwnership, function(req, res) {
 	// Sanitize javascript from text forms
 	req.body.blog.body = req.sanitize(req.body.blog.body);
 	
@@ -104,7 +112,7 @@ router.put('/blogs/:id/', isLoggedIn, function(req, res) {
 /*
 	Creating a DELETE route to remove blogs from the database.
 */
-router.delete('/blogs/:id', isLoggedIn, function(req, res) {
+router.delete('/blogs/:id', checkBlogOwnership, function(req, res) {
 	Blog.findByIdAndRemove(req.params.id, function(err) {
 		if (err) {
 			res.redirect("/blogs");
@@ -119,6 +127,24 @@ function isLoggedIn(req, res, next) {
 		return next();
 	}
 	res.redirect('/login');
+}
+
+function checkBlogOwnership(req, res, next) {
+	if (req.isAuthenticated()) {
+		Blog.findById(req.params.id, function(err, foundBlog) {
+			if (err) {
+				res.redirect('back');
+			} else {
+				if (foundBlog.author.id.equals(req.user._id)) {
+					next();
+				} else {
+					res.redirect('back'); 
+				}
+			}
+		});
+	} else {
+		res.redirect('back');
+	}
 }
 
 module.exports = router;
