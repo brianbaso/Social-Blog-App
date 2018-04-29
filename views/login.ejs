@@ -1,9 +1,11 @@
 <% include ./partials/header %>
 
-<form id="register-login-forms" class="ui form" action="/login" method="POST">
-	<input type="text" name="username" placeholder="username">
-	<input type="password" name="password" placeholder="password">
-	<input class="ui basic green button" type="submit" value="Login!">
-</form>
+<div class="container">
+	<form id="register-login-forms" class="ui form" action="/login" method="POST">
+		<input type="text" name="username" placeholder="username">
+		<input type="password" name="password" placeholder="password">
+		<input class="ui basic green button" type="submit" value="Login!">
+	</form>
+</div>
 
 <% include ./partials/footer %>

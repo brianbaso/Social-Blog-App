@@ -9,6 +9,7 @@ var express		 		= require('express'),
 	app					= express(),
 	methodOverride		= require('method-override'),
 	expressSanitizer	= require('express-sanitizer'),
+	flash				= require('connect-flash'),
 	passport			= require('passport'),
 	LocalStrategy		= require('passport-local'),
 	bodyParser			= require('body-parser'),
@@ -96,6 +97,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 */
 app.use(expressSanitizer());
 
+// Allow flash messages from connect-flash module
+app.use(flash());
+
 /*
 	Passport config: a bunch of mumbojumbo to automate user authentication with some 
 	useful node modules
@@ -114,6 +118,8 @@ passport.deserializeUser(User.deserializeUser());
 // Allow req.user to be accessed in any ejs file
 app.use(function(req, res, next) {
 	res.locals.currentUser = req.user;
+	res.locals.error = req.flash('error');
+	res.locals.success = req.flash('success');
 	next();
 });
 
