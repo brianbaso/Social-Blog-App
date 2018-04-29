@@ -41,7 +41,6 @@ router.post('/register', function(req, res) {
 });
 
 router.get('/login', function(req, res) {
-
 	res.render('login');
 });
 
@@ -64,6 +63,10 @@ router.get('/logout', function(req, res) {
 
 router.get('/', function(req, res) {
 	res.redirect('/blogs');
+});
+
+router.get('/about', function(req, res) {
+	res.render('about');
 });
 
 module.exports = router;

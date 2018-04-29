@@ -1,5 +1,5 @@
 /*
-	Brian Baso's Personal Website, Created April 14, 2018.
+	Social Blog Web App
 
 	The 'app.js' file acts as the 'behind the scenes' machine for our ejs files in the
 	views directory. Server side Javascript code in this file can facilitate the exchange
